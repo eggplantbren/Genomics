@@ -1,0 +1,157 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%  auck2e.sty  a LaTeX2e style file for assignments in the Dept of Maths
+%%               
+%%  created by Paul Hafner 9 May 1995
+%%  modified by Paul Bonnington 23/1/96  to  v0.1c
+%%  modified by Paul Bonnington 1/3/96  to  v0.1d
+%%  modified by Paul Bonnington 28/3/96  to  v0.1e
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\typeout{ }
+\typeout{auck2e.sty  ---  version 0.1e  --- 28 Mar 1996}
+\typeout{a LaTeX2e style for assignments for the Department of Mathematics}
+\typeout{version 0.1e is optimised for the SciTec Unix System -Tamaki}
+\typeout{ }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcounter{lastpagecounter}
+\AtEndDocument{
+\setcounter{lastpagecounter}{\c@page}%
+\immediate\write\@auxout{%
+\string\newlabel{last.page}{{\@currentlabel}{\thelastpagecounter}}%
+}
+}
+\RequirePackage{fancyheadings}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%  some macros for easy placement of fancy footers and headers
+%%  (they pick up stuff that was placed into the title band)
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% a macro \ssp (single sided print) putting things into place 
+%%% for single sided printing
+%%% (no difference for even and odd pages)
+%%%
+%%% \singlesided puts the normal stuff for assignments in place
+%%%
+\def\pagenofm{{\rm Page \thepage\ of \pageref{last.page}}}
+\def\ssp#1#2#3#4#5#6{%
+  \lfoot{#1}\cfoot{#2}\rfoot{#3}\lhead{#4}\chead{#5}\rhead{#6}}
+\def\singlesided{%
+\ssp{{\small\lbandv}}{{\small\cbandv}}{{\small\pagenofm}}{}{}{}}
+%%%
+%%% a macro \dsp (double sided print) putting things into place 
+%%% for double- sided printing
+%%% (even and odd pages reverse the order of header and footer)
+%%%
+%%% \doublesided puts the normal stuff for assignments in place
+%%%
+\def\dsp#1#2#3#4#5#6#7#8{{\tiny
+\@twosidetrue\lfoot[#4]{#1}\cfoot[#3]{#2}\rfoot[#1]{#4}%
+\lhead[#8]{#5}\chead[#7]{#6}\rhead[#5]{#8}}}
+\def\doublesided{%
+\dsp{{\small\lbandv}}{{\small\cbandv}}{{\small\cbandv}}{{\small\pagenofm}}{}{}{}{}}
+%%%
+%%% a macro \twoup (two up print) putting things into place 
+%%% for 2-up printing
+%%% (even and odd pages treated differently, mirroring 
+%%%   the setup of \doublesided)
+%%%
+\def\twoup{%
+\dsp{{\small\pagenofm}}{{\small\cbandv}}{{\small\cbandv}}{{\small\lbandv}}{}{}{}{}}
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%  an environment for questions: \begin{Questions} ... \end{Questions}
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{Questions}%
+{\setlength{\leftmargini}{0pt}
+\setlength{\leftmarginii}{8mm}
+\setlength{\leftmarginiii}{10mm}
+\renewcommand{\labelenumi}{{\bf \theenumi.}}
+\renewcommand{\labelenumiii}{(\theenumiii)}
+\begin{enumerate}\addtolength{\itemsep}{2mm}}{\end{enumerate}}
+
+\newenvironment{questions}%
+{\setlength{\leftmargini}{0pt}
+\setlength{\leftmarginii}{8mm}
+\setlength{\leftmarginiii}{10mm}
+\renewcommand{\labelenumi}{{\bf \theenumi.}}
+\renewcommand{\labelenumiii}{(\theenumiii)}
+\begin{enumerate}\addtolength{\itemsep}{2mm}}{\end{enumerate}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%  the title band stuff: 
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% \makeband produces the band at top of first page
+%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% its content is controlled via 3 macros \lband, \cband, \rband
+%%%%%%%%%%%%%%
+\newcommand{\makeband}{%
+\vspace{-1cm}
+%\hrule
+\begin{center}
+\myheadv
+\end{center}
+\hrule
+\vspace*{0.7mm}
+\hbox to \hsize{\rlap{\lbandv}\hfill \cbandv \hfill \llap{\rbandv}}
+\vspace*{0.7mm}
+\hrule
+\vspace{3mm}
+}
+\long\def\myhead#1{\def\myheadv{#1}}
+\myhead{\par {\sc Department of \mydeptv}\\[8mm]}
+\def\mydept#1{\def\mydeptv{#1}}
+\mydept{Statistics}
+\def\lband#1{\def\lbandv{#1}}
+\lband{}
+\def\cband#1{\def\cbandv{#1}}
+\cband{}
+\def\rband#1{\def\rbandv{#1}}
+\rband{}
+%%%%%%%%%%%%%% \due
+\def\due#1{\rband{Due: #1}}
+%%%%%%%%%%%%%% \paper
+\def\paper#1{\def\paperv{#1}}
+\paper{}
+\lband{\paperv}
+%%%%%%%%%%%%%%% \thetitle
+\def\thetitle#1{\cband{#1}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%
+%%% setting page size and other layout defaults
+%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ExecuteOptions{a4paper}
+\addtolength{\oddsidemargin}{-2cm} 
+\addtolength{\evensidemargin}{-2cm}
+\addtolength{\topmargin}{-2cm} 
+\addtolength{\textwidth}{4cm}
+\addtolength{\textheight}{4cm}
+\addtolength{\headheight}{9pt}
+\addtolength{\footskip}{9pt}
+%\footrulewidth0.4pt
+%\headrulewidth0pt
+\sloppy
+\parindent0pt
+\parskip3ex
+\pagestyle{fancy}
+
+\thispagestyle{fancy} 
+
+\singlesided
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+

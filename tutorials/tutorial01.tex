@@ -1,0 +1,187 @@
+\documentclass[12pt]{article}
+\usepackage{auck2e,multicol,amssymb,amsmath,color}
+\usepackage{epsfig}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+\usepackage{microtype}
+
+%\usepackage{graphicx}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\mmark}[1]{[{#1 mark(s)}]}
+\newcommand{\markk}[1]{[{\bf #1 marks}]}
+\newcommand{\dspace}{\renewcommand{\baselinestretch}{2} \small \normalsize}
+\newcommand{\sspace}{\renewcommand{\baselinestretch}{1} \small \normalsize}
+\newcommand{\btheta}{\mbox{\boldmath $\theta$}}
+\newcommand{\blambda}{\mbox{\boldmath $\lambda$}}
+\newcommand{\bTheta}{\mbox{\boldmath $\Theta$}}
+\newcommand{\bzeta}{\mbox{\boldmath $\zeta$}}
+\newcommand{\bpi}{\mbox{\boldmath $\pi$}}
+\newcommand{\bphi}{\mbox{\boldmath $\phi$}}
+\newcommand{\ba}{\mbox{\boldmath $a$}}
+\newcommand{\bb}{\mbox{\boldmath $b$}}
+\newcommand{\bd}{\mbox{\boldmath $d$}}
+\newcommand{\bm}{\mbox{\boldmath $m$}}
+\newcommand{\bx}{\mbox{\boldmath $x$}}
+\newcommand{\bh}{\mbox{\boldmath $h$}}
+\newcommand{\bu}{\mbox{\boldmath $u$}}
+\newcommand{\bP}{\mbox{\boldmath $P$}}
+\newcommand{\bQ}{\mbox{\boldmath $Q$}}
+\newcommand{\bR}{\mbox{\boldmath $R$}}
+\newcommand{\by}{\mbox{\boldmath $y$}}
+\newcommand{\bY}{\mbox{\boldmath $Y$}}
+\newcommand{\bX}{\mbox{\boldmath $X$}}
+\newcommand{\bU}{\mbox{\boldmath $U$}}
+\newcommand{\bD}{\mbox{\boldmath $D$}}
+\newcommand{\bV}{\mbox{\boldmath $V$}}
+\newcommand{\bH}{\mbox{\boldmath $H$}}
+\newcommand{\bgamma}{\mbox{\boldmath $\gamma$}}
+\newcommand{\bGamma}{\mbox{\boldmath $\Gamma$}}
+\newcommand{\balpha}{\mbox{\boldmath $\alpha$}}
+\newcommand{\bbeta}{\mbox{\boldmath $\beta$}}
+\newcommand{\bdelta}{\mbox{\boldmath $\delta$}}
+\newcommand{\bomega}{\mbox{\boldmath $\omega$}}
+\newcommand{\bpsi}{\mbox{\boldmath $\psi$}}
+\newcommand{\bepsilon}{\mbox{\boldmath $\epsilon$}}
+\newcommand{\be}{\begin{eqnarray}}
+\newcommand{\ee}{\end{eqnarray}}
+\def\BackgroundEPS#1#2#3#4{%
+    \special{ps: @beginspecial @setspecial initmatrix
+                0.9 setgray #2 #3 translate #4 dup scale}
+    \special{ps: plotfile #1}
+    \special{ps: @endspecial}
+}
+\newcommand{\wbugs}{{\sffamily\textbf{WinBUGS }}}
+\newcommand{\coda}{{\sffamily\textbf{CODA }}}
+\newcommand{\glm}{{\sffamily\textbf{G.L.M }}}
+\newcommand{\rwb}{{\sffamily\textbf{R2WinBUGS }}}
+\newcommand{\rar}{{\sffamily\textbf{Rock and roll man! }}}
+\newcommand{\anova}{{\sffamily\textbf{ANOVA }}}
+\newcommand{\mcmc}{{\sffamily\textbf{MCMC }}}
+\newcommand{\dic}{{\sffamily\textbf{DIC }}}
+\newcommand{\dagr}{{\sffamily\textbf{DAG }}}
+\newcommand{\boxeq}[1]{%
+\fboxrule=0.5mm%
+\fboxsep=5mm%
+\begin{center}\fcolorbox{black}{yellow}{\begin{minipage}{0.9\linewidth}
+\begin{Beqnarray} #1 \end{Beqnarray}\end{minipage}}\end{center}%
+\fboxrule=1pt%
+\fboxsep=3pt%
+}
+
+\newcommand{\boxst}[1]{%
+\fboxrule=0.5mm%
+\fboxsep=5mm%
+\begin{center}\fcolorbox{black}{yellow}{ \begin{minipage}{0.9\linewidth}#1 \end{minipage} }\end{center}%
+\fboxrule=1pt%
+\fboxsep=3pt%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Macro         :   \BackgroundEPS{filename}{tx}{ty}{s}
+%-----------------------------------------------------------------------
+% Description   :   Display an EPS file in the background of the
+%                   current page.
+%-----------------------------------------------------------------------
+% Author        :   Bernard Desruisseaux (bernard@XYZZYcs.mcgill.ca)
+%-----------------------------------------------------------------------
+% Usage         :   \BackgroundEPS{pic.eps}{80}{100}{2}
+%                   \BackgroundEPS{"`gunzip -c pic.eps.gz"}{80}{100}{2}
+%                   \BackgroundEPS{"`zcat pic.eps.Z"}{80}{100}{2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paper{Introduction to Bayesian Statistics}
+\due{Not for assessment}
+\thetitle{\textbf{Tutorial 1}} 
+\begin{document}
+
+
+%\BackgroundEPS{bayes.eps}{0}{0}{1.2}
+\makeband
+You may do the questions with a pen and paper (you may need a calculator),
+or in R or any other language of your choice.
+
+\begin{Questions}
+
+\item \textbf{Task:}
+A customs officer inspects a package containing five dolls, and thinks
+that the dolls might contain hidden drugs. Let $\theta$ be the number of dolls
+that contain illegal drugs, so the possible values are 0, 1, 2, 3, 4, or 5.
+The customs officer has prior probabilities
+$0.5, 0.025, 0.025, 0.025, 0.025$, and $0.4$ for these six possibilities
+respectively.
+
+\begin{enumerate}
+\item Create {\tt theta} and {\tt prior} vectors to represent the first two
+columns of a Bayes Box.
+\end{enumerate}
+
+The customs officer does not want to damage all of the dolls by inspecting them
+all. Instead, he chooses one
+arbitrarily and thoroughly inspects it, finding no drugs. Let $D$
+be the data that the inspected doll contained no drugs.
+
+\begin{enumerate}
+\item[(b)] Create a vector of likelihoods.
+\item[(c)] Find the posterior distribution for {\tt theta} and hence the posterior
+probability that there are drugs.
+\end{enumerate}
+
+
+\item \textbf{Task:} A basketball player is practicing free throws.
+She attempts $N=100$ shots and the number of successful shots is
+$x=78$. We can think of each shot as having a success probability
+$\theta$ which we'd like to infer. In this question, we'll calculate
+the posterior distribution for $\theta$ given $x$.
+This question is very similar to the polling example from lectures.
+
+\begin{enumerate}
+\item Numerically calculate the
+posterior distribution for $\theta$ given $x=78$ using a
+uniform prior and {\tt theta = seq(0, 1, length=21)}.
+You can get the likelihoods using {\tt dbinom}~or by typing in the
+formula directly.
+\item Find the posterior mean for $\theta$ (i.e. the expected value of $\theta$
+according to the posterior distribution). This is also the probability
+of success on the next shot.
+\item The theoretical value of the posterior mean in this example is
+is $(x+1)/(N+2)$ (we'll derive this soon).
+Is the posterior mean from the above calculations exactly
+equal to the theoretical value? If not, why not?
+\item Repeat the above with {\tt theta = seq(0, 1, length=1001)} and the same
+data value $x$. What is the posterior mean for $\theta$ now?
+\item Calculate the posterior probability that $\theta \geq 0.8$.
+\end{enumerate}
+
+{\bf For advanced students:} Do this with {\tt prior} and {\tt post}
+vectors that contain probability densities rather than probabilities.
+
+
+
+%\item \textbf{Task:} Solve the ``taxi'' problem from lectures. First you'll
+%reproduce my results from lectures with a slight change allowing for the
+%possibility of more than 100 taxis (you'll go up to 1000 instead). Then you'll
+%calculate what happens with a bigger dataset.
+
+%\begin{enumerate}
+%\item Make a vector of possible values for $N$ (the number of taxis in the city)
+%ranging from 1 to 1000, and also make a vector to represent a uniform prior.
+%\item Calculate the posterior distribution for $N$ given the example data from
+%class (the observed taxi number was $x=42$).
+%\item Plot the posterior distribution.
+%\item To get more information about the number of taxis in the city, you decide
+%to gather more data by sleeping out for a further nine nights. Altogether, the
+%ten taxi numbers you see are $\{42, 55, 12, 77, 8, 80, 2, 22, 19, 50\}$. If
+%you want to infer $N$ from this data, what will the likelihood be? (Hint: this
+%will involve the product of 10 terms).
+%\item Calculate and plot the posterior distribution for $N$ given the bigger
+%data set. Does the result make sense to you?
+%\end{enumerate}
+
+\end{Questions}
+%\rar
+
+
+\end{document}
+
+
+
+
