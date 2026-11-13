@@ -156,6 +156,39 @@ vectors that contain probability densities rather than probabilities.
 
 
 
+\section*{\large Question 2: Equidae on a Grid}
+{\em For this question, include your code (neat and tidy please) in your answers.
+You may use R, Python+NumPy+Matplotlib, or Matlab}.
+
+Suppose that $x=94$ successes are observed out of $N=100$ trials
+in a binomial experiment with parameter $\theta$. Let the prior be
+$\theta \sim$~Beta$(20, 80)$.
+
+\begin{enumerate}
+\item[(a)] In R, calculate and plot the prior, likelihood, and posterior for
+$\theta$ on common axes. Make sure the prior and posterior are
+normalised properly (as
+densities), but arbitrarily scale the likelihood function so the plot looks
+nice.
+\end{enumerate}
+
+The plot from part (a) should explain the bad joke about Bayesians who
+expect to see a horse, catch a glimpse of a donkey, and therefore believe they
+have seen a mule.
+
+\begin{enumerate}
+\item[(b)] Re-do (a) but with a heavy-tailed prior (specifically, a truncated
+Cauchy distribution), with probability density function:
+\begin{align}
+    p(\theta) &\propto \frac{1}{1 + \left(\frac{\theta - 0.2}{0.1}\right)^2}
+\end{align}
+for $\theta \in [0, 1]$. Does the joke still work?
+
+\item[(c)] Compare the values of the marginal likelihoods in (a) and (b).
+Which is higher? Why?
+\end{enumerate} % End of Q2 parts b and c
+
+
 %\item \textbf{Task:} Solve the ``taxi'' problem from lectures. First you'll
 %reproduce my results from lectures with a slight change allowing for the
 %possibility of more than 100 taxis (you'll go up to 1000 instead). Then you'll
