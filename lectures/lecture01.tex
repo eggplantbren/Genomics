@@ -1270,13 +1270,59 @@ plot(N, post, type="h")
 \end{frame}
 
 
+\begin{frame}
+\frametitle{Another Ignorance Prior: Log-Uniform}
+
+\begin{itemize}
+\item How long is a piece of string?\pause
+\item Twice the distance from the middle to the end.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The Log-Uniform Prior}
+This is useful for a parameter $\theta$ in the situation where:
+
+\begin{itemize}
+\item $\theta$ is known to be positive.\pause
+\item $\theta$ is unknown by orders of magnitude.\pause
+\end{itemize}
+\vspace{0.5em}
+e.g., the distance to some astronomical object might be
+$10^{11}$ metres, or maybe $10^{12}$ metres, or maybe $10^{13}$
+metres. A uniform prior would be inappropriate here.
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{The Log-Uniform Prior Formula}
+
+The formula for the log-uniform prior is
+\begin{align}
+p(\theta) &\propto \frac{1}{\theta}
+\end{align}
+
+It also corresponds to a uniform prior for $\log(\theta)$,
+hence the name.
+
+\end{frame}
+
+
+
 \begin{frame}[fragile]
 \frametitle{Multiple Data Points}
 When the data is more than one number, the likelihood consists
 of a product of terms, one for each data point.
 
 Let's analyse the taxi data for three observations
-$\{x_1, x_2, x_3\} = \{42, 61, 12\}$.
+$\{x_1, x_2, x_3\} = \{42, 61, 12\}$ and use a log-uniform
+prior\footnote{Note: The log-uniform is usually for
+continuous quantities, but it works okay here for a discrete
+one ($N$).}.
 
 \end{frame}
 
