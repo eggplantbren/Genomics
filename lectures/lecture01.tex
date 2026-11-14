@@ -1073,5 +1073,214 @@ answer to the inference problem.
 \end{frame}
 
 
+\begin{frame}
+\frametitle{Taxi Problem}
+
+    \begin{columns} % Create two columns
+        \column{0.5\textwidth} % Left column (50% width)
+
+        \begin{itemize}
+        \item You fall asleep in a foreign city.
+        \item When you wake up in the morning, you see a taxi drive by,
+              which says {\bf This is taxi number 42}.
+        \item How many taxis are in the city?
+        \end{itemize}
+
+        \column{0.5\textwidth} % Right column (50% width)
+        \includegraphics[width=0.95\linewidth]{images/taxis.jpg}
+       
+         (public domain image)
+     \end{columns}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{The Parameter and the Data}
+
+\begin{itemize}
+\item The unknown parameter, $N$, is the number of taxis in the city.\pause
+\item The data, $x$, is the number observed on the taxi that drove past.
+\end{itemize}
+\pause
+Bayes' rule for this circumstance:
+
+\begin{align}
+p(N \given x) \propto p(N)p(x \given N)
+\end{align}
+We have to choose the prior $p(N)$ and the likelihood $p(x \given N)$.
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Bayes Box with Uniform Prior}
+Let's assume $N \leq 100$ and keep our uniform prior for now.
+
+\centering
+{\footnotesize
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Parameter & Prior & Likelihood & Prior $\times$ Likelihood & Posterior \\
+$N$  & $p(N)$ & $p(x \given N)$ & $p(N)p(x\given N)$ & $p(N\given x)$ \\
+\hline
+1 & 0.01 & & & \\
+2 & 0.01  &  & & \\
+... &... &... & ...&... \\
+41 & 0.01 &  & & \\
+42 & 0.01  &  & & \\
+43 & 0.01 & & & \\
+... &... &... & ...&... \\
+99 & 0.01 & & & \\
+100   & 0.01 & & & \\
+\hline
+Total & 1 & & & 1 \\
+\hline
+\end{tabular}
+}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Likelihoods: Direct Reasoning}
+
+\begin{itemize}
+\item If $N=1$, with what probability would we observe $x=42$? \pause
+\item If $N=41$, with what probability would we observe $x=42$? \pause
+\item If $N=42$, with what probability would we observe $x=42$? \pause
+\item If $N=100$, with what probability would we observe $x=42$?
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Likelihoods}
+
+\centering
+{\footnotesize
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Parameter & Prior & Likelihood & Prior $\times$ Likelihood & Posterior \\
+$N$  & $p(N)$ & $p(x \given N)$ & $p(N)p(x\given N)$ & $p(N\given x)$ \\
+\hline
+1 & 0.01 & 0 & & \\
+2 & 0.01  & 0  & & \\
+... &... &... & ...&... \\
+41 & 0.01 & 0 & & \\
+42 & 0.01  & 1/42 & & \\
+43 & 0.01 & 1/43 & & \\
+... &... &... & ...&... \\
+99 & 0.01 & 1/99 & & \\
+100   & 0.01 & 1/100 & & \\
+\hline
+Total & 1 & & & 1 \\
+\hline
+\end{tabular}
+}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Likelihoods: from Sampling Distribution}
+Imagine we did not know $x$ yet, but we did know $N$, the parameter.
+We can assign a probability distribution for $x$ given $N$.
+This would be a discrete uniform distribution, and we can write
+\begin{align}
+x \given N &\sim \textnormal{Uniform}(1, 2, ..., N).
+\end{align}\pause
+
+The formula for this probability distribution is
+\begin{align}
+p(x \given N) &= \left\{
+                    \begin{array}{lr}
+                    \frac{1}{N}, & x \in \{1, 2, ..., N\} \\
+                    0          , & \textnormal{otherwise}.
+                    \end{array}
+                 \right.
+\end{align}
+\end{frame}
+
+\begin{frame}
+\frametitle{Likelihoods: from Sampling Distribution}
+If we take the formula and interpret it as a function of $N$
+with $x$ fixed at 42, it reads
+\begin{align}
+p(x \given N) &= \left\{
+                    \begin{array}{lr}
+                    \frac{1}{N}, & 42 \in \{1, 2, ..., N\} \\
+                    0          , & \textnormal{otherwise}.
+                    \end{array}
+                 \right.
+\end{align}
+which is exactly the rule we `guessed' earlier.
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Likelihoods: from Sampling Distribution}
+In general, we can think of data as being `drawn from'
+some distribution\footnote{Philosophically I object, but it is a useful
+starting point.}
+with unknown parameter $\theta$, written as $p(x \given \theta)$.
+This will be a formula involving both $x$ and $\theta$.
+\pause
+
+When $x$ is known value (plugged in) but $\theta$ isn't, $p(x \given \theta)$
+is now a function of $\theta$ only --- the likelihood function.
+You may have seen this in STATS 210 or other courses. If not, this is a
+reasonable first place to learn about it.
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Likelihoods: from Sampling Distribution}
+Since sampling distributions are conditional on $\theta$ but not on the
+data $x$, they are kind of a prior but for the data instead of the parameter.
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Calculating the Posterior in R}
+This follows the standard recipe, but the likelihood is slightly trickier
+than what we had before.
+\begin{minted}{r}
+N = seq(1, 100)
+prior = rep(1/length(N), length(N))
+lik = 1/N
+lik[N < 42] = 0
+h = prior*lik
+Z = sum(h)
+post = h/Z
+plot(N, post, type="h")
+\end{minted}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Taxi Posterior}
+
+\centering
+\includegraphics[width=0.6\textwidth]{images/taxi_posterior.pdf}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Multiple Data Points}
+When the data is more than one number, the likelihood consists
+of a product of terms, one for each data point.
+
+Let's analyse the taxi data for three observations
+$\{x_1, x_2, x_3\} = \{42, 61, 12\}$.
+
+\end{frame}
+
+
+
 \end{document}
 
