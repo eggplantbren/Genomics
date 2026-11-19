@@ -4,6 +4,7 @@
 \usepackage[english]{babel}
 \usepackage{blindtext}
 \usepackage{microtype}
+\usepackage{minted}
 
 %\usepackage{graphicx}
 \newcommand{\ds}{\displaystyle}
@@ -88,6 +89,8 @@
 %                   \BackgroundEPS{"`zcat pic.eps.Z"}{80}{100}{2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand{\given}{\,|\,}
+
 \paper{Introduction to Bayesian Statistics}
 \due{Not for assessment}
 \thetitle{\textbf{Tutorial 1}} 
@@ -101,7 +104,7 @@ or in R or any other language of your choice.
 
 \begin{Questions}
 
-\item \textbf{Task:}
+\item 
 A customs officer inspects a package containing five dolls, and thinks
 that the dolls might contain hidden drugs. Let $\theta$ be the number of dolls
 that contain illegal drugs, so the possible values are 0, 1, 2, 3, 4, or 5.
@@ -110,8 +113,13 @@ $0.5, 0.025, 0.025, 0.025, 0.025$, and $0.4$ for these six possibilities
 respectively.
 
 \begin{enumerate}
-\item Create {\tt theta} and {\tt prior} vectors to represent the first two
-columns of a Bayes Box.
+\item [(a)] The prior probabilities I wrote down are not entirely arbitrary.
+They are also not a simple uniform distribution, but use uniform
+assumptions in a couple of ways. See if you can identify them.
+
+\item [(b)] If using R or another programming language,
+create {\tt theta} and {\tt prior} vectors to represent the first two
+columns of a Bayes Box. Otherwise, just write down the columns on paper.
 \end{enumerate}
 
 The customs officer does not want to damage all of the dolls by inspecting them
@@ -120,73 +128,72 @@ arbitrarily and thoroughly inspects it, finding no drugs. Let $D$
 be the data that the inspected doll contained no drugs.
 
 \begin{enumerate}
-\item[(b)] Create a vector of likelihoods.
-\item[(c)] Find the posterior distribution for {\tt theta} and hence the posterior
+\item[(c)] What are the values of the likelihoods?
+\item[(d)] Find the posterior distribution for {\tt theta} and hence the posterior
 probability that there are drugs.
 \end{enumerate}
 
 
-\item \textbf{Task:} A basketball player is practicing free throws.
-She attempts $N=100$ shots and the number of successful shots is
-$x=78$. We can think of each shot as having a success probability
-$\theta$ which we'd like to infer. In this question, we'll calculate
-the posterior distribution for $\theta$ given $x$.
-This question is very similar to the polling example from lectures.
-
-\begin{enumerate}
-\item Numerically calculate the
-posterior distribution for $\theta$ given $x=78$ using a
-uniform prior and {\tt theta = seq(0, 1, length=21)}.
-You can get the likelihoods using {\tt dbinom}~or by typing in the
-formula directly.
-\item Find the posterior mean for $\theta$ (i.e. the expected value of $\theta$
-according to the posterior distribution). This is also the probability
-of success on the next shot.
-\item The theoretical value of the posterior mean in this example is
-is $(x+1)/(N+2)$ (we'll derive this soon).
-Is the posterior mean from the above calculations exactly
-equal to the theoretical value? If not, why not?
-\item Repeat the above with {\tt theta = seq(0, 1, length=1001)} and the same
-data value $x$. What is the posterior mean for $\theta$ now?
-\item Calculate the posterior probability that $\theta \geq 0.8$.
-\end{enumerate}
-
-{\bf For advanced students:} Do this with {\tt prior} and {\tt post}
-vectors that contain probability densities rather than probabilities.
-
-
-
-\section*{\large Question 2: Equidae on a Grid}
-{\em For this question, include your code (neat and tidy please) in your answers.
-You may use R, Python+NumPy+Matplotlib, or Matlab}.
-
-Suppose that $x=94$ successes are observed out of $N=100$ trials
-in a binomial experiment with parameter $\theta$. Let the prior be
-$\theta \sim$~Beta$(20, 80)$.
-
-\begin{enumerate}
-\item[(a)] In R, calculate and plot the prior, likelihood, and posterior for
-$\theta$ on common axes. Make sure the prior and posterior are
-normalised properly (as
-densities), but arbitrarily scale the likelihood function so the plot looks
-nice.
-\end{enumerate}
-
-The plot from part (a) should explain the bad joke about Bayesians who
-expect to see a horse, catch a glimpse of a donkey, and therefore believe they
-have seen a mule.
-
-\begin{enumerate}
-\item[(b)] Re-do (a) but with a heavy-tailed prior (specifically, a truncated
-Cauchy distribution), with probability density function:
+\item 
+Let $x_i$ be the number of times a new puppy pees on the floor on
+day $i$. Given a rate parameter $\lambda$, this has a Poisson
+distribution with mean $\lambda$:
 \begin{align}
-    p(\theta) &\propto \frac{1}{1 + \left(\frac{\theta - 0.2}{0.1}\right)^2}
+p(x_i \given \lambda) &= \frac{\lambda^{x_i}\exp(-\lambda)}{x_i!}.
 \end{align}
-for $\theta \in [0, 1]$. Does the joke still work?
+Four days are observed, and the data is
+$\boldsymbol{x} = \{x_1, x_2, x_3, x_4\} = \{2, 0, 2, 3\}$.
+This one is best done in a computer.
 
-\item[(c)] Compare the values of the marginal likelihoods in (a) and (b).
-Which is higher? Why?
-\end{enumerate} % End of Q2 parts b and c
+\begin{enumerate}
+\item [(a)] Create a vector for a uniform {\tt prior}
+for {\tt lambda} between 0 and 10, in steps of 0.1.
+\item [(b)] Calculate the likelihoods. You can use the product
+of the Poisson formula four times, or (in R at least) you can
+use \mintinline{r}{dpois()}.
+\item [(c)] Calculate the posterior distribution and plot it.
+\item [(d)] Find the expected value of $\lambda$ according to the
+posterior distribution.
+\item [(e)] The classical maximum likelihood estimate is equal
+to the sample mean $\bar{x}$. How different is this from the answer
+to (d). Why is it different? There are two main reasons.
+\end{enumerate}
+
+
+
+
+
+\item
+
+A bad joke suggests that a Bayesian is ``one who,
+vaguely expecting a horse, and catching a glimpse of a donkey, strongly believes he has seen a mule''. The joke comes from the fact that,
+sometimes (but not always),
+if the prior and likelihood peak in different places, the
+posterior peaks in the middle of the two.
+
+Assume there is a parameter $\theta$ whose prior is a standard normal
+distribution, and that some data gave a gaussian likelihood function
+with a peak $\theta=20$:
+\begin{align}
+p(\theta)   &\propto \exp \left(-\frac{1}{2}\theta^2\right) \\
+p(x \given \theta) &\propto \exp \left(-\frac{1}{2}(\theta - 20)^2\right)
+\end{align}
+
+\begin{enumerate}
+\item [(a)] Plot the prior, likelihood, and posterior for $\theta$ on the
+                same set of axes. You will see the origin of the bad joke
+                ($\theta\approx 0$ represents a horse, $\theta\approx 20$
+                 represents a donkey, and
+                 $\theta \approx 10$ represents a mule).
+\item [(b)] Replace the prior with a Cauchy distribution\footnote{This is also
+a $t$ distribution with shape parameter $\nu=1$.}
+                $p(\theta) \propto 1/(1+\theta^2)$, which has much heavier tails
+                than a normal distribution. Re-make the plot. Does
+                the joke still work?
+
+\item [(c)] Is the marginal likelihood higher with the normal
+prior or the Cauchy prior? Why?
+\end{enumerate}
 
 
 %\item \textbf{Task:} Solve the ``taxi'' problem from lectures. First you'll
