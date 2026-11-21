@@ -1,0 +1,662 @@
+\documentclass{beamer}
+\usetheme[pageofpages=of,% String used between the current page and the
+                         % total page count.
+          bullet=circle,% Use circles instead of squares for bullets.
+          titleline=true,% Show a line below the frame title.
+          alternativetitlepage=true,% Use the fancy title page.
+       %   titlepagelogo=logo-polito,% Logo for the first page.
+       %   watermark=watermark-polito,% Watermark used in every page.
+       %   watermarkheight=100px,% Height of the watermark.
+       %   watermarkheightmult=4,% The watermark image is 4 times bigger
+                                % than watermarkheight.
+          ]{Torino}
+
+\setbeamertemplate{footline}{
+  \begin{beamercolorbox}[wd=\paperwidth,ht=1ex,dp=1ex]{footline}
+    \vspace{5pt} \hspace{1em} \insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}
+}
+
+\newcommand{\given}{\,|\,}
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\newcommand{\bmu}{\boldsymbol{\mu}}
+
+\usepackage{colortbl}
+\definecolor{LightGray}{gray}{0.9}
+\definecolor{DarkGray}{gray}{0.3}
+\definecolor{LightCyan}{rgb}{0.9, 1, 1}
+\definecolor{LightRed}{rgb}{1, 0.8, 0.8}
+\definecolor{LightGreen}{rgb}{0.8, 1, 0.8}
+\definecolor{DarkGreen}{rgb}{0.3, 0.5, 0.3}
+
+
+
+\author{Brendon J. Brewer}
+\title{Introduction to Bayesian Statistics}
+\institute{Summer Institute in Statistical Genomics \\
+The University of Auckland, November 2026}
+\date{}
+
+
+\linespread{1.3}
+\usepackage{minted}
+\usepackage[utf8]{inputenc}
+\usepackage{dsfont}
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+
+\begin{frame}
+\centering
+\includegraphics[width=0.7\textwidth]{images/calvin.jpg}
+
+\end{frame}
+
+\begin{frame}
+\centering
+\Large
+Bayesian T-Tests (as an excuse to motivate hierarchical models)
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Plan}
+
+\begin{itemize}
+\item Today we will look at Bayesian equivalents of the famous $t$-test.\pause
+\item We will have three different models, all with the same
+sampling distribution. The differences will be in the priors.\pause
+\item (i) an easy but unrealistic prior, (ii) a 2D
+spike-and-slab prior in JAGS, and (iii) our first hierarchical prior.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Fake Data from Ed Jaynes}
+
+\begin{itemize}
+\item Manufacturer A's widgets:
+Mean lifetime = 42 hours, SD = 7.48 hours based on $N=9$.\pause
+\item Manufacturer B's widgets:
+Mean lifetime = 50 hours, SD = 6.48 hours based on $N=4$.\pause
+\end{itemize}
+
+Is one manufacturer better than the other?
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Boxplot}
+
+\begin{center}
+\includegraphics[width=0.6\textwidth]{images/widgets_boxplot.pdf}
+\end{center}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Classical $t$-test Hypotheses}
+
+\begin{align}
+H_0: \quad \mu_1 = \mu_2 \\
+H_1: \quad \mu_1 \neq \mu_2
+\end{align}
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Classical $t$-test Results}
+\footnotesize
+\begin{minted}{r}
+> t.test(data$x1, data$x2)
+
+	Welch Two Sample t-test
+
+data:  data$x1 and data$x2
+t = -1.7461, df = 6.1694, p-value = 0.13
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -19.136445   3.136445
+sample estimates:
+mean of x mean of y 
+       42        50 
+\end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Meaning of the $p$-value}
+The p-value is the probability, assuming $H_0$ is true, that a dataset would
+show this level of difference or greater.\\[0.5em]\pause
+
+The posterior probability of $H_0$ is the probability that $H_0$ is true,
+given the data. More what we want to know.
+\end{frame}
+
+\begin{frame}
+\frametitle{Sampling Distribution Assumptions}
+The classical $t$-test assumptions for the sampling distribution are the same
+(apart from the interpretation of it) as what we will adopt:
+\begin{align}
+x_{1, i} \given \mu_1, \mu_2, \sigma &\sim \textnormal{Normal}(\mu_1, \sigma^2) \\
+x_{2, i} \given \mu_1, \mu_2, \sigma &\sim \textnormal{Normal}(\mu_2, \sigma^2).
+\end{align}
+\pause
+
+We will calculate joint posterior distributions for the
+three  unknown parameters $\mu_1$, $\mu_2$, and
+$\sigma$. From that, we can calculate the probability of $H_0$.
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{JAGS Code for Sampling Distribution}
+The sampling distribution/likelihood code in JAGS is straightforward,
+we just have to name the variables as they are named in the data:
+\begin{minted}{r}
+for(i in 1:N1)
+{
+    x1[i] ~ dnorm(mu1, 1/sigma^2)
+}
+for(i in 1:N2)
+{
+    x2[i] ~ dnorm(mu2, 1/sigma^2)
+}
+\end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Model 1: Priors}
+In our first model, we will just set wide priors for the parameters.
+
+\begin{minted}{r}
+mu1 ~ dnorm(0, 1/1000^2)
+mu2 ~ dnorm(0, 1/1000^2)
+log_sigma ~ dunif(-10, 10)
+sigma <- exp(log_sigma)
+\end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Model 1: Results}
+After running JAGS, we can get some posterior probabilities,
+computed from the posterior samples.
+
+\begin{minted}{r}
+> mean(results$mu2 > results$mu1)
+[1] 0.9437
+> mean(results$mu2 == results$mu1)
+[1] 0
+\end{minted}
+\pause
+
+Why is the second result zero?
+
+
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Model 1: Priors}
+We got zero posterior probability for $H_0$ (that $\mu_1 = \mu_2$)
+because we gave it zero prior probability! Take a look at the joint prior
+for $\mu_1$ and $\mu_2$:
+\vspace{-1.5em}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{images/ttest_prior1.pdf}
+\end{center}
+
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Model 1: Priors}
+Not only does this prior assign zero probability to the hypothesis that the
+two groups are equal, it assigns hardly any probability to the possibility
+that they are even {\bf similar}.\\[0.5em]\pause
+
+If we think $\mu_1$ and $\mu_2$ might be the same, we need some points
+exactly on
+the diagonal. If we think they might be different but similar, we need more
+points {\em near} the diagonal.
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Aside: Priors in JAGS}
+You can get JAGS to sample your priors, simply by not passing in any data.
+In this example, it will get confused if you don't pass \mintinline{r}{N1}
+and \mintinline{r}{N2}, so just pass a minimal list containing those.
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Model 2: A Spike-and-Slab Prior in JAGS}
+In this model, we will make a spike-and-slab prior in JAGS. Generally, this is
+not easy to do and is not common. Our strategy will be:\pause
+\begin{itemize}
+\item Leave the $\mu_1$ prior the same. \pause
+\item Make a parameter called \mintinline{r}{difference},
+with a 50\% probability of being zero, 25\% of being negative,
+and 25\% of being positive.\pause
+\item Define $\mu_2$ as $\mu_1 + $\mintinline{r}{difference}.\pause
+\end{itemize}
+Thus, we will have a 50\% prior probability of $H_0$.
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Model 2: The Prior for \mintinline{r}{difference}}
+\tiny
+\begin{minted}{r}
+# Typical magnitude of 'difference' if it is not zero
+L <- 5
+
+# Just a 'latent' parameter
+u ~ dunif(-1, 1)
+
+# Either zero or exponential with width L
+size_of_difference <- step(u)*(-L*log(1 - u))
+
+# Flag for positive or negative
+C ~ dbern(0.5)
+
+# Final result
+difference <- (2*C-1)*size_of_difference
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Model 2: Joint Prior}
+(Zoomed in)
+\begin{center}
+\includegraphics[width=0.5\textwidth]{images/ttest_prior2.png}
+\end{center}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Running Model 2}
+Let's run Model 2, and look at:\pause
+
+\begin{itemize}
+\item The joint posterior distribution for $\mu_1$ and $\mu_2$.\pause
+\item The posterior probability of $H_0$.\pause
+\end{itemize}
+
+{\bf Note}: If \mintinline{r}{L} is increased, the posterior probability of
+$H_1$ will go down, and $H_0$ will go up. Why?
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Summary of Models 1 and 2}
+\begin{itemize}
+\item Model 1: $\mu_1$ and $\mu_2$ could be anything. Doesn't even know that
+they might be similar in value, so assigns very small prior probability to that.\pause
+\item Model 2: $\mu_1$ could be anything. $\mu_2$ might be exactly equal to
+$\mu_1$. If it's not exactly equal, it's at least close (high prior probability
+of being between $\pm$ \mintinline{r}{L} of $\mu_1$). 
+\end{itemize}
+
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Model 3}
+For our third model, we will give up on $H_0$, but we will concentrate
+prior probability {\em near} the diagonal. It will be our first example of
+a {\bf hierarchical model}. We will also extend it further in the future,
+when we study a Bayesian version of one-way ANOVA.\\[0.5em]\pause
+
+Model 3 will express the idea that $\mu_1$ and $\mu_2$ might be very close
+together, somewhat close together, or far apart, with roughly equal prior
+probability for those possibilities.
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Hierarchical Model}
+In a hierarchical model, we specify priors indirectly in terms of additional
+quantities called {\bf hyperparameters}. We will change from
+\begin{minted}{r}
+mu1 ~ dnorm(0, 1/1000^2)
+mu2 ~ dnorm(0, 1/1000^2)
+\end{minted}
+\pause
+to
+\begin{minted}{r}
+mu1 ~ dnorm(grand_mean, 1/diversity^2)
+mu2 ~ dnorm(grand_mean, 1/diversity^2)
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Hierarchical Model}
+We have made use of two `hyperparameters' called \mintinline{r}{grand_mean},
+which sets the centre of the prior for the $\mu$s, and \mintinline{r}{diversity},
+which sets the width of the prior for the $\mu$s. The hyperparameters
+themselves need priors. This is usually where wide/vague priors come back.\\[0.5em]
+
+\begin{minted}{r}
+grand_mean ~ dnorm(0, 1/1000^2)
+log_diversity ~ dunif(-10, 10)
+diversity <- exp(log_diversity)
+\end{minted}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Hierarchical Models: Interpretation}
+\footnotesize
+Interpretation of hierarchical models can be a bit tricky if you're not used
+to them. Ways to think about them: \pause
+\begin{itemize}
+\item Your prior for all the $\bmu$ parameters is `as if they had been
+      drawn from a common distribution
+      whose centre and width we don't know'.\pause
+\item This means the prior $p(\bmu) = \int p(\balpha) p(\bmu \given \balpha) \, d\balpha$
+      is now dependent --- learning one $\mu$ {\em does} tell you about the
+      other (via the hyperparameters)\pause
+\item You can often think of the hierarchical model as merely a `trick' to
+      get that sort of dependence into your prior.\pause
+\item You can generate hyperparameters from the prior and then parameters
+      from their prior, and inspect what happens.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Model 3: Joint Prior}
+(Zoomed in)
+\begin{center}
+\includegraphics[width=0.5\textwidth]{images/ttest_prior3.png}
+\end{center}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Model 3: Results}
+Let's see how plausible it is that Manufacturer B is better than Manufacturer
+A.
+
+\begin{minted}{r}
+> mean(results$mu2 > results$mu1)
+[1] 0.63326
+> mean(results$mu2 == results$mu1)
+[1] 0
+\end{minted}
+\pause
+
+The second value is zero like with Model 1, and for the same reasons.
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Summary}
+We looked at three different models to replace the classical $t$-test.
+Models 2 and 3 encoded the most realistic assumptions.\\[0.5em]\pause
+
+Hopefully it is clear that it would be relatively simple to relax the
+assumption of the same $\sigma$ applying to both groups, and the normal
+distribution assumption, if necessary.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Reminder of T-Tests}
+
+\begin{center}
+\includegraphics[width=0.6\textwidth]{images/widgets_boxplot.pdf}
+\end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Reminder of T-Test Model 3}
+Recall T-Test Model 3, which modelled the idea that the group mean
+parameters $\mu_1$ and $\mu_2$ might be close together or far apart, but not
+exactly equal. The priors were hierarchical:\pause
+\footnotesize
+
+\begin{minted}{r}
+grand_mean ~ dnorm(0, 1/1000^2)
+log_diversity ~ dunif(-10, 10)
+diversity <- exp(log_diversity)
+mu1 ~ dnorm(grand_mean, 1/diversity^2)
+mu2 ~ dnorm(grand_mean, 1/diversity^2)
+log_sigma ~ dunif(-10, 10)
+sigma <- exp(log_sigma)
+\end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Reminder of T-Test Model 3}
+(Zoomed in)
+\begin{center}
+\includegraphics[width=0.5\textwidth]{images/ttest_prior3.png}
+\end{center}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Reminder of T-Test Model 3}
+The sampling distribution/likelihood part of T-Test Model 3 was very
+formulaic:
+
+\begin{minted}{r}
+for(i in 1:N1)
+{
+    x1[i] ~ dnorm(mu1, 1/sigma^2)
+}
+for(i in 1:N2)
+{
+    x2[i] ~ dnorm(mu2, 1/sigma^2)
+}
+\end{minted}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Example Data: More Groups}
+
+\begin{columns} % Create two columns
+    \column{0.4\textwidth} % Left column (50% width)
+    \begin{itemize}
+    \item Masses of starlings, in grams, at four different locations.
+    \item The locations don't have an order to them, so we are not doing
+          simple linear regression.
+    \end{itemize}
+
+    \column{0.6\textwidth} % Right column (50% width)
+    \includegraphics[width=1\linewidth]{images/starling.png}
+ \end{columns}
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{One-way ANOVA}
+In classical statistics, we might be interested in the hypothesis
+\begin{align}
+H_0:\quad \mu_1 = \mu_2 = \mu_3 = \mu_4.
+\end{align}
+\pause
+
+The method for handling this classically is one-way analysis of variance
+(ANOVA). We will instead make a Bayesian model that is similar to T-Test
+Model 3, but for more groups. We give up on a precise $H_0$.
+We also don't analyse any variance!
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Starling Data: CSV File}
+The data is in a different format compared to before (all masses are in one
+vector).
+\begin{minted}{r}
+"location","Y"
+1,78
+1,88
+1,87
+...
+2,78
+2,78
+2,83
+...
+\end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{One-way ANOVA: Sampling Distribution}
+Because of the new data format, we need to rewrite the JAGS
+code for the sampling distribution/likelihood.
+
+\begin{minted}{r}
+for(i in 1:length(Y))
+{
+    Y[i] ~ dnorm(mu[location[i]], 1/sigma^2)
+}
+\end{minted}
+\pause
+We now need priors for the four \mintinline{r}{mu} parameters
+and also \mintinline{r}{sigma}.
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{One-way ANOVA: Priors}
+The priors will be very similar to T-Test Model 3, except our
+\mintinline{r}{mu} parameters are now in a vector.
+\footnotesize
+\begin{minted}{r}
+grand_mean ~ dnorm(0, 1/1000^2)
+log_diversity ~ dunif(-10, 10)
+diversity <- exp(log_diversity)
+for(i in 1:4)
+{
+    mu[i] ~ dnorm(grand_mean, 1/diversity^2)
+}
+log_sigma ~ dunif(-10, 10)
+sigma <- exp(log_sigma)
+\end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Running JAGS}
+Let's run JAGS on the starling data and look at the following outputs:
+
+\begin{itemize}
+\item The trace plots for the \mintinline{r}{mu}s.\pause
+\item The posterior probability that \mintinline{r}{mu[2] > mu[3]}.\pause
+\item The posterior distribution for \mintinline{r}{log_diversity},
+which describes the degree to which the $\mu$s are different from each other.
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Shrinkage and Borrowing Strength}
+Since the prior for the $\mu$ parameters is dependent, learning one
+tells you about another. Similarly, learning {\em about} one from some data
+provides information about the others.\pause
+
+The posterior for
+$\mu_1$ is narrower than you would get from analysing group 1's data alone.
+Estimates of $\mu_1$ are also dragged a little bit towards the average mass
+for the {\em other} groups.
+\pause
+
+To understand why this happens, imagine if all the {\em other} groups' data
+told you the hyperparameters with no uncertainty. What would your
+prior for $\mu_1$ become?
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Pre-Whitening}
+
+\begin{itemize}
+\item Recall that, due to the way the hierarchical model is constructed,
+the prior for the $\mu$ parameters is actually correlated.\pause
+\item JAGS uses MCMC methods that perform worse when the {\em posterior}
+is correlated.\pause
+\item If the prior is correlated, that makes it more likely that the posterior
+is also.\pause
+\item ``Pre-whitening'' can sometimes help --- we will write the same prior
+assumptions but in a way that makes the parameters' priors independent.
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Pre-Whitening}
+\begin{minted}{r}
+for(i in 1:4) # Original form
+{
+    mu[i] ~ dnorm(grand_mean, 1/diversity^2)
+}
+
+for(i in 1:4) # Modified form, all priors independent
+{
+    n[i] ~ dnorm(0, 1)
+    mu[i] <- grand_mean + diversity*n[i]
+}
+\end{minted}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Pre-Whitening}
+In this example, the pre-whitening doesn't actually make much difference.
+By the way, the term comes from {\bf white noise} which is noise where
+every value is independent.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Multiple Testing}
+We will now look at an example that strongly resembles genomics (it took a while).
+
+
+\end{frame}
+
+\end{document}
+
