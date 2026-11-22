@@ -248,37 +248,33 @@ and \mintinline{r}{N2}, so just pass a minimal list containing those.
 
 \begin{frame}[fragile]
 \frametitle{Model 2: A Spike-and-Slab Prior in JAGS}
-In this model, we will make a spike-and-slab prior in JAGS. Generally, this is
-not easy to do and is not common. Our strategy will be:\pause
+In this model, we will make a spike-and-slab prior in JAGS.
+Our strategy will be:\pause
 \begin{itemize}
 \item Leave the $\mu_1$ prior the same. \pause
-\item Make a parameter called \mintinline{r}{difference},
+\item Make a parameter called \mintinline{r}{diff},
 with a 50\% probability of being zero, 25\% of being negative,
 and 25\% of being positive.\pause
-\item Define $\mu_2$ as $\mu_1 + $\mintinline{r}{difference}.\pause
+\item Define $\mu_2$ as $\mu_1 + $\mintinline{r}{diff}.\pause
 \end{itemize}
 Thus, we will have a 50\% prior probability of $H_0$.
 \end{frame}
 
 
 \begin{frame}[fragile]
-\frametitle{Model 2: The Prior for \mintinline{r}{difference}}
+\frametitle{Model 2: Priors}
 \tiny
 \begin{minted}{r}
-# Typical magnitude of 'difference' if it is not zero
+mu1 ~ dnorm(0, 1/1000^2)
+
 L <- 5
+diff ~ dnorm(0, 1/L^2)
+flag ~ dbern(0.5)
+real_diff <- flag*diff
+mu2 <- mu1 + real_diff
 
-# Just a 'latent' parameter
-u ~ dunif(-1, 1)
-
-# Either zero or exponential with width L
-size_of_difference <- step(u)*(-L*log(1 - u))
-
-# Flag for positive or negative
-C ~ dbern(0.5)
-
-# Final result
-difference <- (2*C-1)*size_of_difference
+log_sigma ~ dunif(-10, 10)
+sigma <- exp(log_sigma)
 \end{minted}
 
 \end{frame}
@@ -656,7 +652,68 @@ every value is independent.
 We will now look at an example that strongly resembles genomics (it took a while).
 
 
+
+
 \end{frame}
+
+\begin{frame}
+\frametitle{Multiple Testing}
+Let $\mu_i$ be the true effect size of gene $i$ and let $y_i$
+be a noisy measurement of it. Suppose we have $N=100$ genes.
+Suppose that for all $i$, we have
+\begin{align}
+y_i \given \mu_i &\sim \textnormal{Normal}(\mu_i, \sigma^2),
+\end{align}
+with $\sigma$ being common to all genes (this assumption can be relaxed if
+appropriate).
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Multiple Testing}
+We will attempt to infer the $\mu_i$ from the $y_i$ measurements.
+Example data set: % Show a simulated data set
+
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Multiple Testing}
+If we try to do a significance test, or estimate each $\mu_i$ from each
+$y_i$ individually, we run into multiple testing problems.
+
+% Demonstrate this with a classical hypothesis test
+% Demonstrate this with individual Bayesian parameter estimation
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Multiple Testing}
+From a Bayesian point of view, the multiple testing problem that arises
+from treating each gene individually and separately occurs because implicitly
+we have an independent prior for all of the $\mu_i$ parameters.\pause
+
+And independent priors have consequences. For example, if
+$\mu_i \sim \textnormal{Uniform}(-100, 100)$ independently, then the prior
+probability that every effect is between $-10$ and $10$ is
+$0.1^{100}$, which is far too small.
+\end{frame}
+
+\begin{frame}
+\frametitle{Hierarchical Model with all Genes Having an Effect}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Hierarchical Model with only some genes Having an Effect}
+
+\end{frame}
+
+
 
 \end{document}
 
