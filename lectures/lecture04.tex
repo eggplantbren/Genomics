@@ -659,7 +659,7 @@ We will now look at an example that strongly resembles genomics (it took a while
 \begin{frame}
 \frametitle{Multiple Testing}
 Let $\mu_i$ be the true effect size of gene $i$ and let $y_i$
-be a noisy measurement of it. Suppose we have $N=100$ genes.
+be a noisy measurement of it. Suppose we have $N=1000$ genes.
 Suppose that for all $i$, we have
 \begin{align}
 y_i \given \mu_i &\sim \textnormal{Normal}(\mu_i, \sigma^2),
@@ -679,39 +679,125 @@ Example data set: % Show a simulated data set
 
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Simulating the Dataset}
+\begin{minted}{r}
+set.seed(123)
+N = 1000
+p_on = 0.1 # True hyperparameter values
+grand_mean = 0.0
+diversity = 1.0
+sigma = 0.1 # Measurement noise SD
+mus = rnorm(N, grand_mean, diversity)
+mus[runif(N) > p_on] = 0.0
+y = mus + sigma*rnorm(N)
+\end{minted}
+\end{frame}
+
 \begin{frame}
 \frametitle{Multiple Testing}
 If we try to do a significance test, or estimate each $\mu_i$ from each
-$y_i$ individually, we run into multiple testing problems.
+$y_i$ individually, we run into multiple testing problems
 
-% Demonstrate this with a classical hypothesis test
-% Demonstrate this with individual Bayesian parameter estimation
+\begin{minted}{r}
+mean(p_values < 0.05)
+[1] 0.127
+\end{minted}
 
+Not way off, but a little on the high side. Also, because I know the ground
+truth: 127 genes were declared significant. 83 truly have an effect.
+44 are false positives.
 
 \end{frame}
 
 \begin{frame}
 \frametitle{Multiple Testing}
-From a Bayesian point of view, the multiple testing problem that arises
-from treating each gene individually and separately occurs because implicitly
-we have an independent prior for all of the $\mu_i$ parameters.\pause
+From a Bayesian point of view, there is also a multiple testing problem
+if we apply a simple 1D spike-and-slab model separately to each
+gene. We would often find too many with nonzero effects.\pause
 
-And independent priors have consequences. For example, if
-$\mu_i \sim \textnormal{Uniform}(-100, 100)$ independently, then the prior
-probability that every effect is between $-10$ and $10$ is
-$0.1^{100}$, which is far too small.
-\end{frame}
+This is because our priors would implicitly be independent for each gene,
+and independent priors have consequences. For example, if each gene has a
+nonzero effect with prior probability 0.5, our prior over how many have an
+effect is actually Binomial$(N, 0.5)$ which could be very narrow.
 
-\begin{frame}
-\frametitle{Hierarchical Model with all Genes Having an Effect}
-
+The model is secretly expressing the belief that half of genes have an effect.
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Hierarchical Model with only some genes Having an Effect}
+\frametitle{Hierarchical Spike-and-Slab Model}
+
+\begin{minted}{r}
+model
+{
+    log_sigma ~ dunif(-10, 10)
+    sigma <- exp(log_sigma)
+
+    log_diversity ~ dunif(-10, 10)
+    diversity <- exp(log_diversity)
+
+    p_effect ~ dunif(0, 1)
+
+    for(i in 1:length(y))
+    {
+        effect_if_nonzero[i] ~ dnorm(0, 1/diversity^2)
+        flag[i] ~ dbern(p_effect)
+        mu[i] <- effect_if_nonzero[i]*flag[i]
+
+        y[i] ~ dnorm(mu[i], 1/sigma^2)
+    }
+}
+\end{minted}
 
 \end{frame}
+
+\begin{frame}
+\frametitle{Hierarchical Spike-and-Slab Model Results}
+
+\begin{minted}{r}
+> mean(results$p_effect)
+[1] 0.09848944
+> sd(results$p_effect)
+[1] 0.01117252
+> mean(results$sigma)
+[1] 0.09876848
+> sd(results$sigma)
+[1] 0.002640779
+> mean(results$diversity)
+[1] 1.087571
+> sd(results$diversity)
+[1] 0.08464839
+\end{minted}
+
+Remember that the true values were 0.1, 0.1, and 1 respectively.
+And we didn't need to assume that sigma was known.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Which genes have an effect?}
+
+\begin{minted}{r}
+> mean(results$p_effect)
+[1] 0.09848944
+> sd(results$p_effect)
+[1] 0.01117252
+> mean(results$sigma)
+[1] 0.09876848
+> sd(results$sigma)
+[1] 0.002640779
+> mean(results$diversity)
+[1] 1.087571
+> sd(results$diversity)
+[1] 0.08464839
+\end{minted}
+
+Remember that the true values were 0.1, 0.1, and 1 respectively.
+And we didn't need to assume that sigma was known.
+
+\end{frame}
+
 
 
 
