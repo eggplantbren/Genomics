@@ -673,9 +673,11 @@ appropriate).
 \begin{frame}
 \frametitle{Multiple Testing}
 We will attempt to infer the $\mu_i$ from the $y_i$ measurements.
-Example data set: % Show a simulated data set
-
-
+Example data set:
+\vspace*{-1em}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{images/genes.pdf}
+\end{center}
 
 \end{frame}
 
@@ -694,19 +696,31 @@ y = mus + sigma*rnorm(N)
 \end{minted}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Multiple Testing}
 If we try to do a significance test, or estimate each $\mu_i$ from each
 $y_i$ individually, we run into multiple testing problems
 
 \begin{minted}{r}
+# Classical hypothesis test of mu[i] = 0 assuming sigma=0.1
+p_values = numeric(N)
+for(i in 1:N)
+{
+    p_values[i] = 2*pnorm(-abs(ys[i]), mean=0, sd=0.1)
+}
 mean(p_values < 0.05)
 [1] 0.127
 \end{minted}
 
+\end{frame}
+
+\begin{frame}
+\frametitle{Multiple Testing}
+
 Not way off, but a little on the high side. Also, because I know the ground
 truth: 127 genes were declared significant. 83 truly have an effect.
 44 are false positives.
+
 
 \end{frame}
 
@@ -725,20 +739,16 @@ The model is secretly expressing the belief that half of genes have an effect.
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Hierarchical Spike-and-Slab Model}
 
+{\footnotesize
 \begin{minted}{r}
-model
-{
     log_sigma ~ dunif(-10, 10)
     sigma <- exp(log_sigma)
-
     log_diversity ~ dunif(-10, 10)
     diversity <- exp(log_diversity)
-
     p_effect ~ dunif(0, 1)
-
     for(i in 1:length(y))
     {
         effect_if_nonzero[i] ~ dnorm(0, 1/diversity^2)
@@ -747,14 +757,15 @@ model
 
         y[i] ~ dnorm(mu[i], 1/sigma^2)
     }
-}
 \end{minted}
+}
 
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Hierarchical Spike-and-Slab Model Results}
 
+{\footnotesize
 \begin{minted}{r}
 > mean(results$p_effect)
 [1] 0.09848944
@@ -769,35 +780,30 @@ model
 > sd(results$diversity)
 [1] 0.08464839
 \end{minted}
+}
 
 Remember that the true values were 0.1, 0.1, and 1 respectively.
 And we didn't need to assume that sigma was known.
 
 \end{frame}
 
-\begin{frame}
+
+\begin{frame}[fragile]
 \frametitle{Which genes have an effect?}
 
+{\footnotesize
 \begin{minted}{r}
-> mean(results$p_effect)
-[1] 0.09848944
-> sd(results$p_effect)
-[1] 0.01117252
-> mean(results$sigma)
-[1] 0.09876848
-> sd(results$sigma)
-[1] 0.002640779
-> mean(results$diversity)
-[1] 1.087571
-> sd(results$diversity)
-[1] 0.08464839
+mu = as.matrix(results[, 2:1001])
+plot(colMeans(mu != 0))
 \end{minted}
+}
 
-Remember that the true values were 0.1, 0.1, and 1 respectively.
-And we didn't need to assume that sigma was known.
+\vspace*{-1em}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{images/colMeans.pdf}
+\end{center}
 
 \end{frame}
-
 
 
 
