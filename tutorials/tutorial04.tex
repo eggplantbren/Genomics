@@ -1,0 +1,167 @@
+\documentclass[12pt]{article}
+\usepackage{auck2e,multicol,amssymb,amsmath,color}
+\usepackage{epsfig}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+\usepackage{microtype}
+\usepackage{minted}
+
+%\usepackage{graphicx}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\mmark}[1]{[{#1 mark(s)}]}
+\newcommand{\markk}[1]{[{\bf #1 marks}]}
+\newcommand{\dspace}{\renewcommand{\baselinestretch}{2} \small \normalsize}
+\newcommand{\sspace}{\renewcommand{\baselinestretch}{1} \small \normalsize}
+\newcommand{\btheta}{\mbox{\boldmath $\theta$}}
+\newcommand{\blambda}{\mbox{\boldmath $\lambda$}}
+\newcommand{\bTheta}{\mbox{\boldmath $\Theta$}}
+\newcommand{\bzeta}{\mbox{\boldmath $\zeta$}}
+\newcommand{\bpi}{\mbox{\boldmath $\pi$}}
+\newcommand{\bphi}{\mbox{\boldmath $\phi$}}
+\newcommand{\ba}{\mbox{\boldmath $a$}}
+\newcommand{\bb}{\mbox{\boldmath $b$}}
+\newcommand{\bd}{\mbox{\boldmath $d$}}
+\newcommand{\bm}{\mbox{\boldmath $m$}}
+\newcommand{\bx}{\mbox{\boldmath $x$}}
+\newcommand{\bh}{\mbox{\boldmath $h$}}
+\newcommand{\bu}{\mbox{\boldmath $u$}}
+\newcommand{\bP}{\mbox{\boldmath $P$}}
+\newcommand{\bQ}{\mbox{\boldmath $Q$}}
+\newcommand{\bR}{\mbox{\boldmath $R$}}
+\newcommand{\by}{\mbox{\boldmath $y$}}
+\newcommand{\bY}{\mbox{\boldmath $Y$}}
+\newcommand{\bX}{\mbox{\boldmath $X$}}
+\newcommand{\bU}{\mbox{\boldmath $U$}}
+\newcommand{\bD}{\mbox{\boldmath $D$}}
+\newcommand{\bV}{\mbox{\boldmath $V$}}
+\newcommand{\bH}{\mbox{\boldmath $H$}}
+\newcommand{\bgamma}{\mbox{\boldmath $\gamma$}}
+\newcommand{\bGamma}{\mbox{\boldmath $\Gamma$}}
+\newcommand{\balpha}{\mbox{\boldmath $\alpha$}}
+\newcommand{\bbeta}{\mbox{\boldmath $\beta$}}
+\newcommand{\bdelta}{\mbox{\boldmath $\delta$}}
+\newcommand{\bomega}{\mbox{\boldmath $\omega$}}
+\newcommand{\bpsi}{\mbox{\boldmath $\psi$}}
+\newcommand{\bepsilon}{\mbox{\boldmath $\epsilon$}}
+\newcommand{\be}{\begin{eqnarray}}
+\newcommand{\ee}{\end{eqnarray}}
+\def\BackgroundEPS#1#2#3#4{%
+    \special{ps: @beginspecial @setspecial initmatrix
+                0.9 setgray #2 #3 translate #4 dup scale}
+    \special{ps: plotfile #1}
+    \special{ps: @endspecial}
+}
+\newcommand{\wbugs}{{\sffamily\textbf{WinBUGS }}}
+\newcommand{\coda}{{\sffamily\textbf{CODA }}}
+\newcommand{\glm}{{\sffamily\textbf{G.L.M }}}
+\newcommand{\rwb}{{\sffamily\textbf{R2WinBUGS }}}
+\newcommand{\rar}{{\sffamily\textbf{Rock and roll man! }}}
+\newcommand{\anova}{{\sffamily\textbf{ANOVA }}}
+\newcommand{\mcmc}{{\sffamily\textbf{MCMC }}}
+\newcommand{\dic}{{\sffamily\textbf{DIC }}}
+\newcommand{\dagr}{{\sffamily\textbf{DAG }}}
+\newcommand{\boxeq}[1]{%
+\fboxrule=0.5mm%
+\fboxsep=5mm%
+\begin{center}\fcolorbox{black}{yellow}{\begin{minipage}{0.9\linewidth}
+\begin{Beqnarray} #1 \end{Beqnarray}\end{minipage}}\end{center}%
+\fboxrule=1pt%
+\fboxsep=3pt%
+}
+
+\newcommand{\boxst}[1]{%
+\fboxrule=0.5mm%
+\fboxsep=5mm%
+\begin{center}\fcolorbox{black}{yellow}{ \begin{minipage}{0.9\linewidth}#1 \end{minipage} }\end{center}%
+\fboxrule=1pt%
+\fboxsep=3pt%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Macro         :   \BackgroundEPS{filename}{tx}{ty}{s}
+%-----------------------------------------------------------------------
+% Description   :   Display an EPS file in the background of the
+%                   current page.
+%-----------------------------------------------------------------------
+% Author        :   Bernard Desruisseaux (bernard@XYZZYcs.mcgill.ca)
+%-----------------------------------------------------------------------
+% Usage         :   \BackgroundEPS{pic.eps}{80}{100}{2}
+%                   \BackgroundEPS{"`gunzip -c pic.eps.gz"}{80}{100}{2}
+%                   \BackgroundEPS{"`zcat pic.eps.Z"}{80}{100}{2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\given}{\,|\,}
+
+\paper{Introduction to Bayesian Statistics}
+\due{Not for assessment}
+\thetitle{\textbf{Tutorial 3}} 
+\begin{document}
+
+
+%\BackgroundEPS{bayes.eps}{0}{0}{1.2}
+\makeband
+
+
+\begin{Questions}
+\item The file {\tt american\_football.R} contains measurements of the weights
+of players on five NFL teams, measured in kilograms. 17 players were measured
+from each team. You will apply the Bayesian ``one-way ANOVA'' model from lectures
+to this data.
+
+\begin{enumerate}
+\item Make boxplots of the data using R's {\tt boxplot} function.
+\item Write up the Bayesian ``one-way ANOVA'' model and modify the
+first {\tt for} loop so there are five {\tt mu} parameters instead of four.
+\item According to the assumptions in the model, what is the prior probability
+of the hypothesis $H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4 = \mu_5$? What will the
+posterior probability of $H_0$ be?
+\item Run the code and inspect the trace plots.
+\item The data suggest Team 3 (Denver Broncos)
+is the heaviest and Team 5 (San Francisco 49ers) is the lightest, on average.
+Find the posterior probability that $\mu_3 > \mu_5$.
+\item Look at the posterior distribution for the {\tt log\_diversity}
+hyperparameter. What does it show?
+\end{enumerate}
+
+
+\item
+The file {\tt kobe\_bryant.csv} contains data on the number of shots
+(field goals) attempted by basketball player Kobe Bryant, and the number of successes achieved, for each season of his NBA career.
+The only two columns you will use are attempts and successes. Use the following hierarchical
+model:
+\begin{minted}{r}
+model
+{
+    grand_mean ~ dunif(-10, 10)
+    diversity ~ dunif(0, 3)
+    for(i in 1:length(successes))
+    {
+        l[i] ~ dnorm(grand_mean, 1/diversity^2)
+        logit(theta[i]) <- l[i]
+        successes[i] ~ dbin(theta[i], attempts[i])
+    }
+}
+\end{minted}
+
+The logit transformation is used because a normal prior would allow values
+outside the range $[0, 1]$. The logit transformation makes sure that
+the success probability for each season, $\theta$, is between 0 and 1.
+
+\begin{enumerate}
+\item[(a)] Identify the hyperparameters, the parameters, and the data.
+\item[(b)] How greatly did Kobe Bryant’s shooting ability vary across seasons?
+\item[(c)] Can you think of any interesting changes you could make to the model? If you
+can, try implementing them.
+\item[(d)] Instead of the hierarchical model, try analysing each season's
+\mintinline{r}{attempts} and \mintinline{r}{successes} using a Uniform$(0, 1)$
+prior for the success probability $\theta$ for each season. Analytically
+compute the posterior mean and standard deviation using the formulas
+for the Beta distribution (you can find these on Wikipedia or elsewhere).
+\item[(e)] Compare the posterior means and standard deviations from (d)
+to what you get from the hierarchical model.
+\end{Questions}
+
+\end{document}
+
+
+
+
