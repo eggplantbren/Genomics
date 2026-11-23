@@ -1,0 +1,160 @@
+\documentclass[12pt]{article}
+\usepackage{auck2e,multicol,amssymb,amsmath,color}
+\usepackage{epsfig}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+\usepackage{microtype}
+\usepackage{minted}
+
+%\usepackage{graphicx}
+\newcommand{\ds}{\displaystyle}
+\newcommand{\mmark}[1]{[{#1 mark(s)}]}
+\newcommand{\markk}[1]{[{\bf #1 marks}]}
+\newcommand{\dspace}{\renewcommand{\baselinestretch}{2} \small \normalsize}
+\newcommand{\sspace}{\renewcommand{\baselinestretch}{1} \small \normalsize}
+\newcommand{\btheta}{\mbox{\boldmath $\theta$}}
+\newcommand{\blambda}{\mbox{\boldmath $\lambda$}}
+\newcommand{\bTheta}{\mbox{\boldmath $\Theta$}}
+\newcommand{\bzeta}{\mbox{\boldmath $\zeta$}}
+\newcommand{\bpi}{\mbox{\boldmath $\pi$}}
+\newcommand{\bphi}{\mbox{\boldmath $\phi$}}
+\newcommand{\ba}{\mbox{\boldmath $a$}}
+\newcommand{\bb}{\mbox{\boldmath $b$}}
+\newcommand{\bd}{\mbox{\boldmath $d$}}
+\newcommand{\bm}{\mbox{\boldmath $m$}}
+\newcommand{\bx}{\mbox{\boldmath $x$}}
+\newcommand{\bh}{\mbox{\boldmath $h$}}
+\newcommand{\bu}{\mbox{\boldmath $u$}}
+\newcommand{\bP}{\mbox{\boldmath $P$}}
+\newcommand{\bQ}{\mbox{\boldmath $Q$}}
+\newcommand{\bR}{\mbox{\boldmath $R$}}
+\newcommand{\by}{\mbox{\boldmath $y$}}
+\newcommand{\bY}{\mbox{\boldmath $Y$}}
+\newcommand{\bX}{\mbox{\boldmath $X$}}
+\newcommand{\bU}{\mbox{\boldmath $U$}}
+\newcommand{\bD}{\mbox{\boldmath $D$}}
+\newcommand{\bV}{\mbox{\boldmath $V$}}
+\newcommand{\bH}{\mbox{\boldmath $H$}}
+\newcommand{\bgamma}{\mbox{\boldmath $\gamma$}}
+\newcommand{\bGamma}{\mbox{\boldmath $\Gamma$}}
+\newcommand{\balpha}{\mbox{\boldmath $\alpha$}}
+\newcommand{\bbeta}{\mbox{\boldmath $\beta$}}
+\newcommand{\bdelta}{\mbox{\boldmath $\delta$}}
+\newcommand{\bomega}{\mbox{\boldmath $\omega$}}
+\newcommand{\bpsi}{\mbox{\boldmath $\psi$}}
+\newcommand{\bepsilon}{\mbox{\boldmath $\epsilon$}}
+\newcommand{\be}{\begin{eqnarray}}
+\newcommand{\ee}{\end{eqnarray}}
+\def\BackgroundEPS#1#2#3#4{%
+    \special{ps: @beginspecial @setspecial initmatrix
+                0.9 setgray #2 #3 translate #4 dup scale}
+    \special{ps: plotfile #1}
+    \special{ps: @endspecial}
+}
+\newcommand{\wbugs}{{\sffamily\textbf{WinBUGS }}}
+\newcommand{\coda}{{\sffamily\textbf{CODA }}}
+\newcommand{\glm}{{\sffamily\textbf{G.L.M }}}
+\newcommand{\rwb}{{\sffamily\textbf{R2WinBUGS }}}
+\newcommand{\rar}{{\sffamily\textbf{Rock and roll man! }}}
+\newcommand{\anova}{{\sffamily\textbf{ANOVA }}}
+\newcommand{\mcmc}{{\sffamily\textbf{MCMC }}}
+\newcommand{\dic}{{\sffamily\textbf{DIC }}}
+\newcommand{\dagr}{{\sffamily\textbf{DAG }}}
+\newcommand{\boxeq}[1]{%
+\fboxrule=0.5mm%
+\fboxsep=5mm%
+\begin{center}\fcolorbox{black}{yellow}{\begin{minipage}{0.9\linewidth}
+\begin{Beqnarray} #1 \end{Beqnarray}\end{minipage}}\end{center}%
+\fboxrule=1pt%
+\fboxsep=3pt%
+}
+
+\newcommand{\boxst}[1]{%
+\fboxrule=0.5mm%
+\fboxsep=5mm%
+\begin{center}\fcolorbox{black}{yellow}{ \begin{minipage}{0.9\linewidth}#1 \end{minipage} }\end{center}%
+\fboxrule=1pt%
+\fboxsep=3pt%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Macro         :   \BackgroundEPS{filename}{tx}{ty}{s}
+%-----------------------------------------------------------------------
+% Description   :   Display an EPS file in the background of the
+%                   current page.
+%-----------------------------------------------------------------------
+% Author        :   Bernard Desruisseaux (bernard@XYZZYcs.mcgill.ca)
+%-----------------------------------------------------------------------
+% Usage         :   \BackgroundEPS{pic.eps}{80}{100}{2}
+%                   \BackgroundEPS{"`gunzip -c pic.eps.gz"}{80}{100}{2}
+%                   \BackgroundEPS{"`zcat pic.eps.Z"}{80}{100}{2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\given}{\,|\,}
+
+\paper{Introduction to Bayesian Statistics}
+\due{Not for assessment}
+\thetitle{\textbf{Tutorial 5}} 
+\begin{document}
+
+
+%\BackgroundEPS{bayes.eps}{0}{0}{1.2}
+\makeband
+
+
+\begin{Questions}
+\item Remember the coal dataset and the changepoint model from lectures?
+In this question you will do a posterior predictive check.
+
+\begin{enumerate}
+\item Download {\tt coal.R}, the data, and write up the changepoint model
+from lectures.
+\item Add extra code to the model for simulating entirely new data sets
+for a posterior predictive check.
+\item Plot at least 5 fake data sets from the posterior distribution. In your
+opinion, does the real data look typical of the distribution of data simulated
+from the model? i.e. does the model pass a posterior predictive check?
+\end{enumerate}
+
+
+\item Implement the coal changepoint model in R for Nested Sampling (this involves
+editing the functions and variables in {\tt ns-model.R}. Use exactly the same
+priors that we used before (i.e., log-uniform for $\lambda_1$ and $\lambda_2$,
+uniform for the time of the changepoint.
+
+\begin{enumerate}
+\item [(a)] Run Nested Sampling. Inspect the diagnostic plots and the posterior
+samples and make sure they look as you would expect. Also, make a note of the
+marginal likelihood.
+\item [(b)] The independent log-uniform priors for $\lambda_1$ and $\lambda_2$
+are not really appropriate in part (a).
+Realistically, we would expect that if there
+is a change at some point, it will be a modest change (whereas under the independent
+priors, you would most likely expect a drastic change).
+Change the priors to
+\begin{align}
+\log(\lambda_1) &\sim \textnormal{Uniform}(-10, 10) \\
+\log(\lambda_2) &\sim \textnormal{Normal}(\log(\lambda_1), 0.5^2).
+\end{align}
+Run this model. Do you get basically the same posterior distribution?
+What about the marginal likelihood?
+It should be higher than in
+(a) --- why?
+\item [(c)] Consider an alternative model where there is no changepoint,
+so $\lambda_1$ applies to all years. Calculate the marginal likelihood for this
+model too. Then work out the Bayes Factor for this model compared to the one
+in (b)
+\item [(d)] If the change-point model from (c) and the no-change model from
+(b) have prior probabilities of 0.5 each, calculate their posterior
+probabilities.
+\end{enumerate}
+
+\end{Questions}
+
+
+
+
+\end{document}
+
+
+
+
