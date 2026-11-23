@@ -8,3 +8,5 @@ _minted*
 *.snm
 lecture*.pdf
 tutorial*.pdf
+code/ns-output.csv
+code/ns-progress-plot.png
