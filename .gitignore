@@ -1,0 +1,10 @@
+_minted*
+*.aux
+*.log
+*.toc
+*.nav
+*.vrb
+*.out
+*.snm
+lecture*.pdf
+tutorial*.pdf
