@@ -362,7 +362,7 @@ for no good reason IMHO) and has some unique strengths.
 
 
 \begin{frame}[t]{Marginal Likelihood}
-The {\bf marginal likelihood} is useful for ``model selection''. Consider
+The {\bf marginal likelihood} is useful for model comparison. Consider
 two models: $M_1$ with parameters $\theta_1$, $M_2$ with parameters $\theta_2$.
 The marginal likelihoods are:\pause
 \begin{eqnarray*}
@@ -390,6 +390,67 @@ If you have the marginal likelihoods, it's easy:
 
 \end{frame}
 
+
+
+\begin{frame}[t]{Bayesian Model Comparison}
+There are two challenges in Bayesian model comparison:\pause
+
+\begin{itemize}
+\item In the past (less so now, largely due to Nested Sampling), it was
+hard to compute marginal likelihoods.\pause
+\item The marginal likelihoods can be quite sensitive to the choice of
+prior distributions for the parameters within each model.
+Specifically, you can often get sensible parameter estimation results with
+a lazy wide prior such as Uniform$(-1000, 1000)$, but for model comparison
+you would get a different result if you chose Uniform$(-10000, 10000)$
+instead.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}[t]{Choosing Priors}
+In the literature, there are two extremes in discussions about how to choose
+priors. There are so-called subjective approaches where a prior is considered
+to be something like an opinion, or the actual beliefs of a person.\pause
+
+On the other hand, so-called objective techniques try to derive priors
+that are `correct' in some sense, from explicit prior information such as symmetries
+or formal ideas of what `ignorance' means. Such priors often end up uniform
+or log-uniform.
+The difficulty is that there are many competing principles.\pause
+
+I think it is good to draw from both approaches and I often settle on something
+in between.
+\end{frame}
+
+
+
+\begin{frame}[t]{Choosing Priors}
+There is usually a lot of information to consider when assigning priors. We
+are rarely truly ignorant:
+
+\begin{itemize}
+\item What is the effect of the parameter in the model itself (i.e., in the
+sampling distribution)? Certain extremes may be ridiculous and the prior
+should assign them very low probability.\pause
+\item As you vary the parameter, sometimes it might change consequences rapidly
+and other times slowly. You might want the prior to be higher where the
+consequences are changing more rapidly (Jeffreys priors formalise this).\pause
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}{Choosing Priors}
+\begin{itemize}
+\item There might be external data available, either explicitly, or
+implicitly summarised in the beliefs of the practitioner or a domain expert.
+This leads to the topic of `elicitation'.\pause
+\item Some of what is in the data file might actually be prior information.
+For instance, the explanatory variables in a regression model.
+\end{itemize}
+\end{frame}
 
 \begin{frame}[t]{Challenging features}
 Another motivation: standard MCMC methods can get stuck in the following
@@ -504,86 +565,86 @@ use different methods (not MCMC) to generate the new point.
 \end{frame}
 
 
-\begin{frame}[t]{Estimating the $X$ values}
-Nested Sampling gives us a sequence of points with increasing likelihoods,
-but we need to somehow know their $X$-values!
+%\begin{frame}[t]{Estimating the $X$ values}
+%Nested Sampling gives us a sequence of points with increasing likelihoods,
+%but we need to somehow know their $X$-values!
 
-\pause
-The structure of the algorithm lets us estimate them.
+%\pause
+%The structure of the algorithm lets us estimate them.
 
-\pause
-Consider the simple one-dimensional problem with Uniform(0, 1) prior.
+%\pause
+%Consider the simple one-dimensional problem with Uniform(0, 1) prior.
 
-\pause
-When we generate $N$ points from the prior, the distribution for the $X$-value
-of the worst point is Beta$(N, 1)$. So we can use a draw from Beta$(N,1)$ as
-a guess of the $X$ value.
-\end{frame}
-
-
-\begin{frame}[t]{Estimating the $X$ values}
-Each iteration, the worst point should reduce the volume by a factor that has
-a Beta$(N, 1)$ distribution. So we can do this:
-\begin{eqnarray*}
-X_1 &=& t_1\\
-X_2 &=& t_2X_1\\
-X_3 &=& t_3X_2\\
-\end{eqnarray*}
-
-and so on, where $t_i \sim $Beta$(N,1)$. Alternatively, we can use a simple
-approximation.
-\end{frame}
-
-%##########################################################################################################################################
-\begin{frame}[t]{Deterministic Approximation}
-\begin{figure}
-\centering
-\includegraphics[scale=0.2]{images/deterministic.pdf}
-\caption{\small Deterministic approximation. Each iteration reduces
-the volume by a factor $\approx e^{-1/N}$. e.g. if $N=5$, the worst likelihood
-accounts for about 1/5th of the remaining prior volume.}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.35]{images/nested2.pdf}
-\end{figure}
-\end{frame}
+%\pause
+%When we generate $N$ points from the prior, the distribution for the $X$-value
+%of the worst point is Beta$(N, 1)$. So we can use a draw from Beta$(N,1)$ as
+%a guess of the $X$ value.
+%\end{frame}
 
 
-\begin{frame}[t]{Posterior Distribution from Nested Sampling}
-The posterior sample can be obtained by assigning weights $W_j$ to the
-discarded points:
-\begin{align*}
-W_{j} = \frac{L_{j} w_{j}}{Z} 
-\end{align*}
-where $w_{j}=X_{j-1} - X_{j+1}$ is the ``prior weight/width'' associated with the
-point. The ``effective sample size'' is given by
-\begin{align*}
-ESS = \exp \left( - \sum_{j=1}^{m} W_j \log W_j \right)
-\end{align*}
+%\begin{frame}[t]{Estimating the $X$ values}
+%Each iteration, the worst point should reduce the volume by a factor that has
+%a Beta$(N, 1)$ distribution. So we can do this:
+%\begin{eqnarray*}
+%X_1 &=& t_1\\
+%X_2 &=& t_2X_1\\
+%X_3 &=& t_3X_2\\
+%\end{eqnarray*}
 
-\end{frame}
+%and so on, where $t_i \sim $Beta$(N,1)$. Alternatively, we can use a simple
+%approximation.
+%\end{frame}
 
-\begin{frame}[t]{Information}
-NS can also calculate the {\bf information}, also known as the Kullback-Liebler
-divergence from the prior to the posterior.
+%%##########################################################################################################################################
+%\begin{frame}[t]{Deterministic Approximation}
+%\begin{figure}
+%\centering
+%\includegraphics[scale=0.2]{images/deterministic.pdf}
+%\caption{\small Deterministic approximation. Each iteration reduces
+%the volume by a factor $\approx e^{-1/N}$. e.g. if $N=5$, the worst likelihood
+%accounts for about 1/5th of the remaining prior volume.}
+%\end{figure}
+%\end{frame}
 
-\begin{eqnarray*}
-\mathcal{H} &=& \int p(\theta | D) \log\left[\frac{p(\theta | D)}{p(\theta)}\right]
-\, d\theta\\
-&\approx& \log\left(
-\frac{\textnormal{volume of prior}}{\textnormal{volume of posterior}}
-\right)
-\end{eqnarray*}
+%\begin{frame}
 
-\pause
-The uncertainty in the estimate of $\ln(Z)$ is approximately
-$\sqrt{H/N}$.
-\end{frame}
+%\begin{figure}
+%\centering
+%\includegraphics[scale=0.35]{images/nested2.pdf}
+%\end{figure}
+%\end{frame}
+
+
+%\begin{frame}[t]{Posterior Distribution from Nested Sampling}
+%The posterior sample can be obtained by assigning weights $W_j$ to the
+%discarded points:
+%\begin{align*}
+%W_{j} = \frac{L_{j} w_{j}}{Z} 
+%\end{align*}
+%where $w_{j}=X_{j-1} - X_{j+1}$ is the ``prior weight/width'' associated with the
+%point. The ``effective sample size'' is given by
+%\begin{align*}
+%ESS = \exp \left( - \sum_{j=1}^{m} W_j \log W_j \right)
+%\end{align*}
+
+%\end{frame}
+
+%\begin{frame}[t]{Information}
+%NS can also calculate the {\bf information}, also known as the Kullback-Liebler
+%divergence from the prior to the posterior.
+
+%\begin{eqnarray*}
+%\mathcal{H} &=& \int p(\theta | D) \log\left[\frac{p(\theta | D)}{p(\theta)}\right]
+%\, d\theta\\
+%&\approx& \log\left(
+%\frac{\textnormal{volume of prior}}{\textnormal{volume of posterior}}
+%\right)
+%\end{eqnarray*}
+
+%\pause
+%The uncertainty in the estimate of $\ln(Z)$ is approximately
+%$\sqrt{H/N}$.
+%\end{frame}
 
 \begin{frame}[t]{Nested Sampling Code}
 I have written a basic implementation of Nested Sampling in R. Let's
@@ -631,6 +692,15 @@ values have lower likelihoods than what is typical of the posterior distribution
 The shape of the log$(L)$ vs. log$(X)$ plot is also informative: if it is
 straight for a long time, or concave up at some point, your problem contains
 a phase transition, and it's a good thing you used Nested Sampling!
+\end{frame}
+
+
+
+\begin{frame}[t]{Carpenter}
+
+\begin{center}
+\includegraphics[width=0.7\textwidth]{images/carpenter.png}
+\end{center}
 \end{frame}
 
 
